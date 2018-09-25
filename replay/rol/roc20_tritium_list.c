@@ -29,8 +29,7 @@
 /*Used in faSetProcMode() */
 #define FADC_MODE          9  // 9 - Pulse Parameter (ped, sum, time);  10 - Debug Mode (9 + Raw Samples) 
 #define FADC_WINDOW_WIDTH  55
-#define FADC_LATENCY       70
-#define FADC_LATENCY_A1A2  55	
+#define FADC_LATENCY       79
 #define FADC_NSB           2  // # of samples *before* Threshold crossing (TC) to include in sum
 #define FADC_NSA           55 // # of samples *after* Threshold crossing (TC) to include in sum
 #define FADC_AERO_NSA      15 // # of samples *after* Threshold crossing (TC) to include in sum
@@ -168,7 +167,7 @@ rocDownload()
        }
        else{
        printf("FADC THRESHOLDS OFF!\n");
-            faSetThreshold(faSlot(islot), 1, 0xffff);
+           faSetThreshold(faSlot(islot), 1, 0xffff);
 //         if(islot==2){
 //	    faSetThreshold(faSlot(islot), 1, 0xdfff); //0xffff sets all channels to same threshold 
 //            faSetThreshold(faSlot(islot), 60, 0x2000);
@@ -176,30 +175,39 @@ rocDownload()
 //         else
 //            faSetThreshold(faSlot(islot), 1, 0xffff);
         }
-       //     faSetThreshold(faSlot(islot), 190, 0xffff);
 
       /* Set input DAC level */
         if(islot==3)
           {
             faSetDAC(faSlot(islot), 2500, 0xf); //changed for busy test : was 3150 
-            faSetDAC(faSlot(islot), 3200, 0x1ff0);
+            faSetDAC(faSlot(islot), 3200, 0x1ff0);	//raster and bpms
 
-          //  faSetDAC(faSlot(islot), 2975, 0x2000);//these three are A2 channels
-	 //   faSetThreshold(faSlot(islot), 300+57, 0xe);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 57ch = 7mV
+	    faSetDAC(faSlot(islot), 3003, 0x4000);	//A2 channel 24 alternate
+	    faSetDAC(faSlot(islot), 2986, 0x8000);	//A2 channel 25 alternate
           }
         if(islot==2)
           {
-	    //faSetThreshold(faSlot(islot), 300+25, 0x3fff);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 25ch = 3mV
-            faSetDAC(faSlot(islot),3220,0x0fff);	//GC channels
-            faSetDAC(faSlot(islot),3000,0x3000);	//S0 channels
-
-	    //faSetThreshold(faSlot(islot), 300+21, 0xc000);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 25ch = 3mV
+             faSetDAC(faSlot(islot),3087,0x0001);	//S0 channels   DAC=3000
+	     faSetDAC(faSlot(islot),3093,0x0002);       
+	    faSetDAC(faSlot(islot),3088,0x0004);	//GC channels    DAC 3220 
+	    faSetDAC(faSlot(islot),3091,0x0008); 
+	    faSetDAC(faSlot(islot),3087,0x0010);
+	    faSetDAC(faSlot(islot),3091,0x0020);
+	    faSetDAC(faSlot(islot),3082,0x0040);
+	    faSetDAC(faSlot(islot),3084,0x0080);
+	    faSetDAC(faSlot(islot),3085,0x0100);
+	    faSetDAC(faSlot(islot),3092,0x0200);
+	    faSetDAC(faSlot(islot),3091,0x0400);
+	    faSetDAC(faSlot(islot),3076,0x0800);
+	    faSetDAC(faSlot(islot),3085,0x1000); //ADCsum
+	    faSetDAC(faSlot(islot),3035,0x2000); //L1A Timing Reference
+           
+           
 	    faSetDAC(faSlot(islot), 3003, 0x4000);	//A2 channel
 	    faSetDAC(faSlot(islot), 2986, 0x8000);	//A2 channel
           }
         if(islot==0)//s2
 	  {
-	       //faSetThreshold(faSlot(islot), 300+25, 0xffff);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 82ch = 10mV
                faSetDAC(faSlot(islot), 3024, 0x0001); // jumper set to 0.5 V
 	       faSetDAC(faSlot(islot), 3030, 0x0002); // 3200
 	       faSetDAC(faSlot(islot), 2997, 0x0004);
@@ -220,7 +228,6 @@ rocDownload()
 
         if(islot==1) // s2
 	  {
-	       //faSetThreshold(faSlot(islot), 300+25, 0xffff);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 82ch = 10mV
                faSetDAC(faSlot(islot), 3033, 0x0001); // jumper set to 0.5 V
                faSetDAC(faSlot(islot), 3034, 0x0002); // 3200 original value
 	       faSetDAC(faSlot(islot), 3018, 0x0004);
@@ -241,7 +248,6 @@ rocDownload()
 
         if(islot==4) //A2
 	  {
-	   // faSetThreshold(faSlot(islot), 300+21, 0xffff);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 25ch = 3mV
             faSetDAC(faSlot(islot), 2982, 0x0001); // jumper set to 0.5 V
 	    faSetDAC(faSlot(islot), 2993, 0x0002);
 	    faSetDAC(faSlot(islot), 2963, 0x0004);
@@ -262,7 +268,6 @@ rocDownload()
 
         if(islot==5) //A1/A2
           {
-	    //faSetThreshold(faSlot(islot), 300+41, 0x00ff);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 41ch = 5mV
             faSetDAC(faSlot(islot),3317,0x0001);
 	    faSetDAC(faSlot(islot),3309,0x0002);
 	    faSetDAC(faSlot(islot),3308,0x0004);
@@ -272,7 +277,6 @@ rocDownload()
 	    faSetDAC(faSlot(islot),3330,0x0040);
 	    faSetDAC(faSlot(islot),3324,0x0080);
 
-	    //faSetThreshold(faSlot(islot), 300+21, 0xff00);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 25ch = 3mV
             faSetDAC(faSlot(islot),2986,0x0100);
 	    faSetDAC(faSlot(islot),2966,0x0200);
 	    faSetDAC(faSlot(islot),2981,0x0400);
@@ -285,7 +289,6 @@ rocDownload()
         if(islot==6) //A1
 	  {
                // DAC values set such that pedestal samples are at 300ch
-	    //faSetThreshold(faSlot(islot), 300+41, 0xffff);	//for 0.5V setting, 0.5V/4096 = 0.122 mV/channel, so 41ch = 5mV
             faSetDAC(faSlot(islot), 3211, 0x0001); // jumper set to 0.5 V
 	    faSetDAC(faSlot(islot), 3197, 0x0002);
 	    faSetDAC(faSlot(islot), 3216, 0x0004);
@@ -344,21 +347,17 @@ rocDownload()
           if(WANT_THRESHOLD)
             {
             printf("FADC THRESHOLDS ON! (ProcMode Block)\n");
-           // faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, 2, 13, 1, 15,160,2);
-            if(islot==0||islot==1||islot==2)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_AERO_NSA, 1, 15,357,FADC_NSAT);
+            if(islot==0||islot==1)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_LATENCY, FADC_NSB, FADC_AERO_NSA, 1, 15,357,FADC_NSAT);
+            if(islot==2)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_LATENCY, FADC_NSB, FADC_AERO_NSA, 1, 15,357,FADC_NSAT);
             if(islot==3)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,357,FADC_NSAT); //raster and BPM, no thresholds ever
-            if(islot==4||islot==5||islot==6)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY_A1A2, FADC_WINDOW_WIDTH, FADC_NSB, FADC_AERO_NSA, 1, 15,357,FADC_NSAT);
+            if(islot==4||islot==5||islot==6)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_LATENCY, FADC_NSB, FADC_AERO_NSA, 1, 15,357,FADC_NSAT);
             }
           else
             {
             printf("FADC THRESHOLDS OFF! (ProcMode Block)\n");
             if(islot==3)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,357,1);
-            if(islot==4||islot==5||islot==6)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY_A1A2, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,357,1);
-//            if(islot==5||islot==6)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY_A1A2, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,380,1);
-//            if(islot==3)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,330,1);
-//            if(islot==4)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,270,1);
+            if(islot==4||islot==5||islot==6)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,357,1);
             if(islot==0||islot==1||islot==2)faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,357,1);
-	    //     faSetProcMode(faSlot(islot), 10, 135, 135, 5, 30, 1, 4,250,1);
 	    }
 	    faSetTriggerBusyCondition(faSlot(islot),8);		//FIXME DO WE NEED THIS?!?!?!
 
@@ -371,12 +370,12 @@ rocDownload()
   /*************************************************************/
   /* VFTDC initialization                                      */
   /*************************************************************/
-  //was being initiliazed here August 8th 2018  
-  /*vfTDCInit(19<<19, 1<<19, 1,
+  //was being initiliazed here August 8th 2018  ( uncommented and slot set to 5 Sept 20 AC )
+  vfTDCInit(5<<19, 1<<19, 1,
             VFTDC_INIT_SOFT_SYNCRESET |
             VFTDC_INIT_FP_TRIG      |
             VFTDC_INIT_INT_CLKSRC);
-  */
+  
 ////////////////////
 //            VFTDC_INIT_VXS_SYNCRESET |
 //            VFTDC_INIT_VXS_TRIG      |
@@ -388,7 +387,7 @@ rocDownload()
 //          VFTDC_INIT_VXS_CLKSRC);
   int window_width   = 250; /* 250 = 250*4ns = 1000ns */
   int window_latency = 100; /* 100 = 100*4ns =  400ns */
-  //vfTDCSetWindowParamters(0, window_latency, window_width);
+  vfTDCSetWindowParamters(0, window_latency, window_width);
 
   v1495InitCODA(MLUbase,0);		// initialize MLU
   
@@ -456,8 +455,8 @@ for(if1=0; if1<nf1tdc; if1++) {
   //*********
   //* VFTDC *
   //*********
-  //vfTDCSyncReset(0);
-  //vfTDCStatus(0,0);
+  vfTDCSyncReset(0);
+  vfTDCStatus(0,0);
 
   printf("rocPrestart: User Prestart Executed\n");
 }
@@ -506,8 +505,8 @@ for(if1=0; if1<nf1tdc; if1++) {
   //*********
   //* VFTDC *
   //*********
-    /* Use this info to change block level is all modules */
-  //vfTDCSetBlockLevel(0, BLOCKLEVEL);
+  /* Use this info to change block level is all modules */
+  vfTDCSetBlockLevel(0, BLOCKLEVEL);
 
   v1495ClockCountSyncCODA(MLUbase);		//reset MLU clock counter to zero
   
@@ -544,7 +543,7 @@ for(if1=0; if1<nf1tdc; if1++) {
   //*********
   //* VFTDC *
   //*********
-  //vfTDCStatus(0,0);
+  vfTDCStatus(0,0);
 
   printf("rocEnd: Ended after %d events\n", tirGetIntCount());
   ii=0;
@@ -685,7 +684,7 @@ vmeDmaConfig(2, 5, 1);
   //* VFTDC *
   //*********
   BANKOPEN(7,BT_UI4,0);
-  /*
+  
   blkReady = vfTDCBReady(0);
   if(blkReady==0 && timeout<100)
     {
@@ -698,8 +697,8 @@ vmeDmaConfig(2, 5, 1);
       printf("%s: Data not ready in vfTDC.\n",__FUNCTION__);
       return;
     }
-  */
-  /* e.g. Max number of words = Blocklevel * (10 hits per channel + 10 other words) 
+  
+  /* e.g. Max number of words = Blocklevel * (10 hits per channel + 10 other words) */
   dCnt = vfTDCReadBlock(0,dma_dabufp,BLOCKLEVEL*(10*192+10),1);
   if(dCnt<=0)
     {
@@ -709,7 +708,7 @@ vmeDmaConfig(2, 5, 1);
     {
       dma_dabufp += dCnt;
     }
-  */
+  
   BANKCLOSE;
 
     ///////

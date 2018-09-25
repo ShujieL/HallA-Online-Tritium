@@ -7,10 +7,10 @@
  */
 
 /* Event Buffer definitions */
-#define MAX_EVENT_LENGTH   1024*256 	/* Size in Bytes */
+#define MAX_EVENT_LENGTH   1024*128 	/* Size in Bytes */
 //MARCO:
-#define MAX_EVENT_POOL     10
-//#define MAX_EVENT_POOL     400
+#define MAX_EVENT_POOL     25
+//#define MAX_EVENT_POOL     80
 
 /* Define Interrupt source and address */
 #define TIR_SOURCE
@@ -29,13 +29,13 @@
 /* FADC Defaults/Globals */
 
 /*Used in faSetProcMode() */
-#define FADC_MODE          10 // 9 - Pulse Parameter (ped, sum, time);  10 - Debug Mode (9 + Raw Samples) 
+#define FADC_MODE          9 // 9 - Pulse Parameter (ped, sum, time);  10 - Debug Mode (9 + Raw Samples) 
 #define FADC_WINDOW_WIDTH  55 // was 
-#define FADC_LATENCY       74 // was 
-#define FADC_LA_Sh         60 // was 
-#define FADC_WD_Sh         40 // was 
+#define FADC_LATENCY       88 // 
+#define FADC_LA_Sh         78 // was 62 
+#define FADC_WD_Sh         60 // was 
 #define FADC_NSB           2  // # of samples *before* Threshold crossing (TC) to include in sum
-#define FADC_NSA           40 // # of samples *after* Threshold crossing (TC) to include in sum
+#define FADC_NSA           60 // # of samples *after* Threshold crossing (TC) to include in sum
 #define FADC_THRESHOLD     5 // changed 8/6/2017 from 300 : cosmic signals are not large enough to be above threshold
 #define chan_mask  0x0000 // chan mask for threshold setting 
 
@@ -153,24 +153,77 @@ rocDownload()
         else faSetThreshold(faSlot(islot), 1, 0xffff); //0xffff sets all channels to same threshold
     }
        /* Set input DAC level */ //turn off adjusting DAC for slot 2 
+     /// adding islot 0,1,2 
+if(islot==0)      {
+        faSetDAC(faSlot(islot), 3072, 0x0001);   ///S0
+	faSetDAC(faSlot(islot), 3088, 0x0002);
+	faSetDAC(faSlot(islot), 3090, 0x0004); // GC
+	faSetDAC(faSlot(islot), 3092, 0x0008);
+	faSetDAC(faSlot(islot), 3091, 0x0010);
+	faSetDAC(faSlot(islot), 3103, 0x0020);
+	faSetDAC(faSlot(islot), 3080, 0x0040);
+	faSetDAC(faSlot(islot), 3077, 0x0080);
+	faSetDAC(faSlot(islot), 3093, 0x0100);
+	faSetDAC(faSlot(islot), 3085, 0x0200);
+	faSetDAC(faSlot(islot), 3096, 0x0400);
+	faSetDAC(faSlot(islot), 3102, 0x0800);
+	faSetDAC(faSlot(islot), 3071, 0x1000); // Gc sum
+	faSetDAC(faSlot(islot), 3027, 0x2000); // L1A Ref
+	faSetDAC(faSlot(islot), 2998, 0x4000); // last two channels are empty
+	faSetDAC(faSlot(islot), 2998, 0x8000);
+	//faSetDAC(faSlot(islot), 3200, 0xffff);  //previous default value
+       }
+/// islot 1
+if(islot==1){
+        faSetDAC(faSlot(islot), 3040, 0x0001); /// S2L
+	faSetDAC(faSlot(islot), 3059, 0x0002);
+	faSetDAC(faSlot(islot), 3034, 0x0004);
+	faSetDAC(faSlot(islot), 3039, 0x0008);
+	faSetDAC(faSlot(islot), 3067, 0x0010);
+	faSetDAC(faSlot(islot), 3060, 0x0020);
+	faSetDAC(faSlot(islot), 3035, 0x0040);
+	faSetDAC(faSlot(islot), 3047, 0x0080);
+	faSetDAC(faSlot(islot), 3057, 0x0100);
+	faSetDAC(faSlot(islot), 3049, 0x0200);
+	faSetDAC(faSlot(islot), 3053, 0x0400);
+	faSetDAC(faSlot(islot), 3037, 0x0800);
+	faSetDAC(faSlot(islot), 3068, 0x1000);
+	faSetDAC(faSlot(islot), 3056, 0x2000);
+	faSetDAC(faSlot(islot), 3052, 0x4000);
+	faSetDAC(faSlot(islot), 3046, 0x8000);
+	//faSetDAC(faSlot(islot), 3200, 0xffff);  //previous default value
+       }
+// islot2 
+if(islot==2){
+        faSetDAC(faSlot(islot), 3030, 0x0001); // S2R
+	faSetDAC(faSlot(islot), 3047, 0x0002);
+	faSetDAC(faSlot(islot), 3042, 0x0004);
+	faSetDAC(faSlot(islot), 3040, 0x0008);
+	faSetDAC(faSlot(islot), 3049, 0x0010);
+	faSetDAC(faSlot(islot), 3015, 0x0020);
+	faSetDAC(faSlot(islot), 3049, 0x0040);
+	faSetDAC(faSlot(islot), 3024, 0x0080);
+	faSetDAC(faSlot(islot), 3044, 0x0100);
+	faSetDAC(faSlot(islot), 3022, 0x0200);
+	faSetDAC(faSlot(islot), 3046, 0x0400);
+	faSetDAC(faSlot(islot), 3034, 0x0800);
+	faSetDAC(faSlot(islot), 3047, 0x1000);
+	faSetDAC(faSlot(islot), 3039, 0x2000);
+	faSetDAC(faSlot(islot), 3048, 0x4000);
+	faSetDAC(faSlot(islot), 3037, 0x8000);
+       // faSetDAC(faSlot(islot),3220,0xdfff);
+       // faSetDAC(faSlot(islot),3200,0x2000);
+       }
+
        
-      if(islot==2){
+      if(islot==3){
 	faSetDAC(faSlot(islot), 2500, 0xf); //changed for busy test : was 3150 
         faSetDAC(faSlot(islot), 3000, 0x0ff0);//BPM 
         faSetDAC(faSlot(islot), 3000, 0xf000);//prl1 and prl2 
-       }
-      else{
-            if(islot==1){ 
-              faSetDAC(faSlot(islot),3220,0xdfff);
-              faSetDAC(faSlot(islot),3200,0x2000);
-	    }
- 	    else{
-	       if(islot==3||islot==4||islot==5||islot==6)
-                 faSetDAC(faSlot(islot), 3400, 0xffff); // jumper set to 0.5 V
-	       else
-		 faSetDAC(faSlot(islot), 3200, 0xffff);
-	    }
-       }
+      }
+      if(islot==4||islot==5||islot==6||islot==7){
+        faSetDAC(faSlot(islot), 3400, 0xffff); // jumper set to 0.5 V
+      }
       /*  Setup option 1 processing - RAW Window Data     <-- */
       /*        option 2            - RAW Pulse Data */
       /*        option 3            - Integral Pulse Data */
@@ -205,11 +258,11 @@ rocDownload()
 
       // faSetProcMode(faSlot(islot), 10, 85, 40, 5, 60, 1, 4,250,2);
        if(WANT_THRESHOLD)
-         faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, 2, 13, 1, 15,140,2);
+         faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, 2, 13, 1, 15,400,2);
        else{
-         if(islot==2||islot==3||islot==4||islot==5||islot==6)
+         if(islot==3||islot==4||islot==5||islot==6||islot==7)
              faSetProcMode(faSlot(islot), FADC_MODE, FADC_LA_Sh, FADC_WD_Sh, FADC_NSB, FADC_NSA, 1, 15,800,1);
-         else faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,200,1);
+         else faSetProcMode(faSlot(islot), FADC_MODE, FADC_LATENCY, FADC_WINDOW_WIDTH, FADC_NSB, FADC_NSA, 1, 15,400,1);
        }
       //  faSetProcMode(faSlot(islot), 9, 135, 135, 5, 30, 1, 4,250,1);
 
@@ -431,7 +484,7 @@ rocTrigger(int arg)
     {
       //             nwords = faReadBlock(0, dma_dabufp, 5000, 2);	//changed rflag = 2 for Multi Block transfer 5/25/17
        
-      nwords = faReadBlock(faSlot(0), dma_dabufp, 3000, 2);
+      nwords = faReadBlock(faSlot(0), dma_dabufp, 25000, 2);
       // nwords = 0;
       // nwords = 0;
       if (nwords < 0)
