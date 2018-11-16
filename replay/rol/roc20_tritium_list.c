@@ -27,8 +27,8 @@
 /* FADC Defaults/Globals */
 
 /*Used in faSetProcMode() */
-#define FADC_MODE          9  // 9 - Pulse Parameter (ped, sum, time);  10 - Debug Mode (9 + Raw Samples) 
-#define FADC_WINDOW_WIDTH  55
+#define FADC_MODE          10  // 9 - Pulse Parameter (ped, sum, time);  10 - Debug Mode (9 + Raw Samples) 
+#define FADC_WINDOW_WIDTH  79 // was 55
 #define FADC_LATENCY       79
 #define FADC_NSB           2  // # of samples *before* Threshold crossing (TC) to include in sum
 #define FADC_NSA           55 // # of samples *after* Threshold crossing (TC) to include in sum
@@ -36,7 +36,7 @@
 #define FADC_THRESHOLD     5
 #define FADC_NSAT          4 //# of consecutive samples over threshold required for pulse
 #define chan_mask  0x0000 // chan mask for threshold setting 
-#define WANT_THRESHOLD 0  //whether or not want threshold settings
+#define WANT_THRESHOLD 1  //whether or not want threshold settings
 
 int FA_SLOT;
 /* FADC Library Variables */
@@ -52,6 +52,14 @@ unsigned int MAXFADCWORDS=0;
 //unsigned int fadc_window_width=FADC_WINDOW_WIDTH;
 
 int ii;
+
+int sync_or_unbuff;
+static int buffered;
+static int event_cnt = 0;
+static int icnt = 0;
+
+
+#include "usrstrutils.c" // utils to pick up CODA ROC config parameter line
 
 //F1
 #include "f1tdcLib.h"
@@ -85,6 +93,10 @@ int MLUbase = 0x00530000;
 void
 rocDownload()
 {
+ init_strings();
+  buffered = getflag(BUFFERED);
+  printf ("Buffer flag : %d\n",buffered);
+  
 
   printf("Hello!!!! This is our Test of the FADC\n");
 //  int islot, iflag,ifa;
@@ -187,124 +199,124 @@ rocDownload()
           }
         if(islot==2)
           {
-             faSetDAC(faSlot(islot),3087,0x0001);	//S0 channels   DAC=3000
-	     faSetDAC(faSlot(islot),3093,0x0002);       
-	    faSetDAC(faSlot(islot),3088,0x0004);	//GC channels    DAC 3220 
-	    faSetDAC(faSlot(islot),3091,0x0008); 
-	    faSetDAC(faSlot(islot),3087,0x0010);
-	    faSetDAC(faSlot(islot),3091,0x0020);
-	    faSetDAC(faSlot(islot),3082,0x0040);
+            faSetDAC(faSlot(islot),3087,0x0001);	//S0 channels   DAC=3000
+	    faSetDAC(faSlot(islot),3093,0x0002);       
+	    faSetDAC(faSlot(islot),3087,0x0004);	//GC channels    DAC 3220 
+	    faSetDAC(faSlot(islot),3090,0x0008); 
+	    faSetDAC(faSlot(islot),3086,0x0010);
+	    faSetDAC(faSlot(islot),3090,0x0020);
+	    faSetDAC(faSlot(islot),3081,0x0040);
 	    faSetDAC(faSlot(islot),3084,0x0080);
-	    faSetDAC(faSlot(islot),3085,0x0100);
-	    faSetDAC(faSlot(islot),3092,0x0200);
-	    faSetDAC(faSlot(islot),3091,0x0400);
-	    faSetDAC(faSlot(islot),3076,0x0800);
-	    faSetDAC(faSlot(islot),3085,0x1000); //ADCsum
-	    faSetDAC(faSlot(islot),3035,0x2000); //L1A Timing Reference
+	    faSetDAC(faSlot(islot),3084,0x0100);
+	    faSetDAC(faSlot(islot),3091,0x0200);
+	    faSetDAC(faSlot(islot),3090,0x0400);
+	    faSetDAC(faSlot(islot),3075,0x0800);
+	    faSetDAC(faSlot(islot),3087,0x1000); //ADCsum
+	    faSetDAC(faSlot(islot),3033,0x2000); //L1A Timing Reference
            
            
-	    faSetDAC(faSlot(islot), 3003, 0x4000);	//A2 channel
-	    faSetDAC(faSlot(islot), 2986, 0x8000);	//A2 channel
+	    faSetDAC(faSlot(islot), 3001, 0x4000);	//A2 channel
+	    faSetDAC(faSlot(islot), 2985, 0x8000);	//A2 channel
           }
         if(islot==0)//s2
 	  {
-               faSetDAC(faSlot(islot), 3024, 0x0001); // jumper set to 0.5 V
-	       faSetDAC(faSlot(islot), 3030, 0x0002); // 3200
-	       faSetDAC(faSlot(islot), 2997, 0x0004);
-	       faSetDAC(faSlot(islot), 3036, 0x0008);
-	       faSetDAC(faSlot(islot), 3046, 0x0010);
-	       faSetDAC(faSlot(islot), 3015, 0x0020);
-	       faSetDAC(faSlot(islot), 3021, 0x0040);
-	       faSetDAC(faSlot(islot), 3013, 0x0080);
-	       faSetDAC(faSlot(islot), 3022, 0x0100);
-	       faSetDAC(faSlot(islot), 3046, 0x0200);
-	       faSetDAC(faSlot(islot), 3023, 0x0400);
-	       faSetDAC(faSlot(islot), 3016, 0x0800);
+               faSetDAC(faSlot(islot), 3023, 0x0001); // jumper set to 0.5 V
+	       faSetDAC(faSlot(islot), 3029, 0x0002); // 3200
+	       faSetDAC(faSlot(islot), 2996, 0x0004);
+	       faSetDAC(faSlot(islot), 3035, 0x0008);
+	       faSetDAC(faSlot(islot), 3044, 0x0010);
+	       faSetDAC(faSlot(islot), 3014, 0x0020);
+	       faSetDAC(faSlot(islot), 3020, 0x0040);
+	       faSetDAC(faSlot(islot), 3012, 0x0080);
+	       faSetDAC(faSlot(islot), 3021, 0x0100);
+	       faSetDAC(faSlot(islot), 3045, 0x0200);
+	       faSetDAC(faSlot(islot), 3021, 0x0400);
+	       faSetDAC(faSlot(islot), 3015, 0x0800);
 	       faSetDAC(faSlot(islot), 3027, 0x1000);
-	       faSetDAC(faSlot(islot), 3009, 0x2000);
-	       faSetDAC(faSlot(islot), 3025, 0x4000);
-	       faSetDAC(faSlot(islot), 3018, 0x8000);
+	       faSetDAC(faSlot(islot), 3008, 0x2000);
+	       faSetDAC(faSlot(islot), 3023, 0x4000);
+	       faSetDAC(faSlot(islot), 3017, 0x8000);
 	  }
 
         if(islot==1) // s2
 	  {
-               faSetDAC(faSlot(islot), 3033, 0x0001); // jumper set to 0.5 V
-               faSetDAC(faSlot(islot), 3034, 0x0002); // 3200 original value
+               faSetDAC(faSlot(islot), 3032, 0x0001); // jumper set to 0.5 V
+               faSetDAC(faSlot(islot), 3033, 0x0002); // 3200 original value
 	       faSetDAC(faSlot(islot), 3018, 0x0004);
-	       faSetDAC(faSlot(islot), 3013, 0x0008);
-	       faSetDAC(faSlot(islot), 3024, 0x0010);
+	       faSetDAC(faSlot(islot), 3012, 0x0008);
+	       faSetDAC(faSlot(islot), 3023, 0x0010);
 	       faSetDAC(faSlot(islot), 3031, 0x0020);
-	       faSetDAC(faSlot(islot), 3025, 0x0040);
-	       faSetDAC(faSlot(islot), 3021, 0x0080);
-	       faSetDAC(faSlot(islot), 3011, 0x0100);
-	       faSetDAC(faSlot(islot), 3041, 0x0200);
-	       faSetDAC(faSlot(islot), 3013, 0x0400);
-	       faSetDAC(faSlot(islot), 3020, 0x0800);
-	       faSetDAC(faSlot(islot), 3013, 0x1000);
-	       faSetDAC(faSlot(islot), 3046, 0x2000);
+	       faSetDAC(faSlot(islot), 3024, 0x0040);
+	       faSetDAC(faSlot(islot), 3020, 0x0080);
+	       faSetDAC(faSlot(islot), 3010, 0x0100);
+	       faSetDAC(faSlot(islot), 3040, 0x0200);
+	       faSetDAC(faSlot(islot), 3012, 0x0400);
+	       faSetDAC(faSlot(islot), 3018, 0x0800);
+	       faSetDAC(faSlot(islot), 3012, 0x1000);
+	       faSetDAC(faSlot(islot), 3045, 0x2000);
 	       faSetDAC(faSlot(islot), 3031, 0x4000);
-	       faSetDAC(faSlot(islot), 3010, 0x8000);
+	       faSetDAC(faSlot(islot), 3009, 0x8000);
 	  }
 
         if(islot==4) //A2
 	  {
             faSetDAC(faSlot(islot), 2982, 0x0001); // jumper set to 0.5 V
-	    faSetDAC(faSlot(islot), 2993, 0x0002);
-	    faSetDAC(faSlot(islot), 2963, 0x0004);
-	    faSetDAC(faSlot(islot), 2982, 0x0008);
-	    faSetDAC(faSlot(islot), 2968, 0x0010);
+	    faSetDAC(faSlot(islot), 2992, 0x0002);
+	    faSetDAC(faSlot(islot), 2962, 0x0004);
+	    faSetDAC(faSlot(islot), 2981, 0x0008);
+	    faSetDAC(faSlot(islot), 2967, 0x0010);
 	    faSetDAC(faSlot(islot), 3002, 0x0020);
 	    faSetDAC(faSlot(islot), 2975, 0x0040);
 	    faSetDAC(faSlot(islot), 2983, 0x0080);
 	    faSetDAC(faSlot(islot), 2958, 0x0100);
 	    faSetDAC(faSlot(islot), 3000, 0x0200);
 	    faSetDAC(faSlot(islot), 2968, 0x0400);
-	    faSetDAC(faSlot(islot), 2976, 0x0800);
+	    faSetDAC(faSlot(islot), 2975, 0x0800);
 	    faSetDAC(faSlot(islot), 2997, 0x1000);
-	    faSetDAC(faSlot(islot), 2967, 0x2000);
-	    faSetDAC(faSlot(islot), 2957, 0x4000);
-	    faSetDAC(faSlot(islot), 2981, 0x8000);
+	    faSetDAC(faSlot(islot), 2966, 0x2000);
+	    faSetDAC(faSlot(islot), 2956, 0x4000);
+	    faSetDAC(faSlot(islot), 2979, 0x8000);
 	  }
 
         if(islot==5) //A1/A2
           {
-            faSetDAC(faSlot(islot),3317,0x0001);
-	    faSetDAC(faSlot(islot),3309,0x0002);
-	    faSetDAC(faSlot(islot),3308,0x0004);
-	    faSetDAC(faSlot(islot),3342,0x0008);
-	    faSetDAC(faSlot(islot),3320,0x0010);
-	    faSetDAC(faSlot(islot),3328,0x0020);
-	    faSetDAC(faSlot(islot),3330,0x0040);
-	    faSetDAC(faSlot(islot),3324,0x0080);
+            faSetDAC(faSlot(islot),3312,0x0001);
+	    faSetDAC(faSlot(islot),3298,0x0002);
+	    faSetDAC(faSlot(islot),3303,0x0004);
+	    faSetDAC(faSlot(islot),3335,0x0008);
+	    faSetDAC(faSlot(islot),3315,0x0010);
+	    faSetDAC(faSlot(islot),3321,0x0020);
+	    faSetDAC(faSlot(islot),3321,0x0040);
+	    faSetDAC(faSlot(islot),3315,0x0080);
 
-            faSetDAC(faSlot(islot),2986,0x0100);
-	    faSetDAC(faSlot(islot),2966,0x0200);
-	    faSetDAC(faSlot(islot),2981,0x0400);
+            faSetDAC(faSlot(islot),2985,0x0100);
+	    faSetDAC(faSlot(islot),2965,0x0200);
+	    faSetDAC(faSlot(islot),2979,0x0400);
 	    faSetDAC(faSlot(islot),2969,0x0800);
-	    faSetDAC(faSlot(islot),2971,0x1000);
-	    faSetDAC(faSlot(islot),2995,0x2000);
-	    faSetDAC(faSlot(islot),2973,0x4000);
-	    faSetDAC(faSlot(islot),2967,0x8000);
+	    faSetDAC(faSlot(islot),2970,0x1000);
+	    faSetDAC(faSlot(islot),2994,0x2000);
+	    faSetDAC(faSlot(islot),2972,0x4000);
+	    faSetDAC(faSlot(islot),2966,0x8000);
           }
         if(islot==6) //A1
 	  {
                // DAC values set such that pedestal samples are at 300ch
-            faSetDAC(faSlot(islot), 3211, 0x0001); // jumper set to 0.5 V
-	    faSetDAC(faSlot(islot), 3197, 0x0002);
-	    faSetDAC(faSlot(islot), 3216, 0x0004);
-	    faSetDAC(faSlot(islot), 3226, 0x0008);
-	    faSetDAC(faSlot(islot), 3187, 0x0010);
-	    faSetDAC(faSlot(islot), 3219, 0x0020);
-	    faSetDAC(faSlot(islot), 3210, 0x0040);
-	    faSetDAC(faSlot(islot), 3229, 0x0080);
-	    faSetDAC(faSlot(islot), 3203, 0x0100);
-	    faSetDAC(faSlot(islot), 3234, 0x0200);
-	    faSetDAC(faSlot(islot), 3228, 0x0400);
-	    faSetDAC(faSlot(islot), 3214, 0x0800);
-	    faSetDAC(faSlot(islot), 3343, 0x1000);
-	    faSetDAC(faSlot(islot), 3316, 0x2000);
-	    faSetDAC(faSlot(islot), 3310, 0x4000);
-	    faSetDAC(faSlot(islot), 3338, 0x8000);
+            faSetDAC(faSlot(islot), 3205, 0x0001); // jumper set to 0.5 V
+	    faSetDAC(faSlot(islot), 3187, 0x0002);
+	    faSetDAC(faSlot(islot), 3209, 0x0004);
+	    faSetDAC(faSlot(islot), 3219, 0x0008);
+	    faSetDAC(faSlot(islot), 3180, 0x0010);
+	    faSetDAC(faSlot(islot), 3217, 0x0020);
+	    faSetDAC(faSlot(islot), 3201, 0x0040);
+	    faSetDAC(faSlot(islot), 3220, 0x0080);
+	    faSetDAC(faSlot(islot), 3198, 0x0100);
+	    faSetDAC(faSlot(islot), 3227, 0x0200);
+	    faSetDAC(faSlot(islot), 3224, 0x0400);
+	    faSetDAC(faSlot(islot), 3207, 0x0800);
+	    faSetDAC(faSlot(islot), 3338, 0x1000);
+	    faSetDAC(faSlot(islot), 3312, 0x2000);
+	    faSetDAC(faSlot(islot), 3303, 0x4000);
+	    faSetDAC(faSlot(islot), 3331, 0x8000);
 	  }
 
 
@@ -598,7 +610,7 @@ rocTrigger(int arg)
 
   if (stat > 0)
     {
-       nwords = faReadBlock(0, dma_dabufp, 5000, 2);	//changed rflag = 2 for Multi Block transfer 5/25/17
+       nwords = faReadBlock(0, dma_dabufp, 10000, 2);	//changed rflag = 2 for Multi Block transfer 5/25/17
        //  nwords = faReadBlock(faSlot(0), dma_dabufp, 3000, 2);
 
       if (nwords < 0)
@@ -714,26 +726,145 @@ vmeDmaConfig(2, 5, 1);
     ///////
     //MLU//
     ///////
-  
-  unsigned long BCMu_value = 0;
-  unsigned long BCMd_value = 0;
-  BCMu_value = v1495BCM_ReadCODA(0);
-  BCMd_value = v1495BCM_ReadCODA(1);
+
+  //Get Upstream BCM words
+  unsigned short bcmu_0 = v1495BCM_ReadCODAindi(0,0);	//get lowest 16 bits from upstream bcm sum
+  unsigned short bcmu_1 = v1495BCM_ReadCODAindi(0,1);
+  unsigned short bcmu_2 = v1495BCM_ReadCODAindi(0,2);
+  unsigned short bcmu_3 = v1495BCM_ReadCODAindi(0,3);
+  unsigned int bcmu_h = (bcmu_3<<16) + bcmu_2;
+  unsigned int bcmu_l = (bcmu_1<<16) + bcmu_0;
+
+  //Get Downstream BCM words
+  unsigned short bcmd_0 = v1495BCM_ReadCODAindi(1,0);	//get lowest 16 bits from downstream bcm sum
+  unsigned short bcmd_1 = v1495BCM_ReadCODAindi(1,1);
+  unsigned short bcmd_2 = v1495BCM_ReadCODAindi(1,2);
+  unsigned short bcmd_3 = v1495BCM_ReadCODAindi(1,3);
+  unsigned int bcmd_h = (bcmd_3<<16) + bcmd_2;
+  unsigned int bcmd_l = (bcmd_1<<16) + bcmd_0;
 
   BANKOPEN(1495,BT_UI4,0);		//MLU Readout bank
     vmeDmaConfig(2,3,0);
     *dma_dabufp++ = LSWAP(0x14951495);
     *dma_dabufp++ = LSWAP(v1495ClockCountReadCODA());			//32 bit Clock Count
-    *dma_dabufp++ = LSWAP((unsigned int)(BCMu_value>>32));		//upper 32 bits of upstream bcm
-    *dma_dabufp++ = LSWAP((unsigned int)(BCMu_value & 0xFFFF));		//lower 32 bits of upstream bcm
-    *dma_dabufp++ = LSWAP((unsigned int)(BCMd_value>>32));		//upper 32 bits of downstream bcm
-    *dma_dabufp++ = LSWAP((unsigned int)(BCMd_value & 0xFFFF));		//lower 32 bits of downstream bcm
+    *dma_dabufp++ = LSWAP(bcmu_h);		//upper 32 bits of upstream bcm
+    *dma_dabufp++ = LSWAP(bcmu_l);		//lower 32 bits of upstream bcm
+    *dma_dabufp++ = LSWAP(bcmd_h);		//upper 32 bits of downstream bcm
+    *dma_dabufp++ = LSWAP(bcmd_l);		//lower 32 bits of downstream bcm
     *dma_dabufp++ = LSWAP(0x14950000);
     vmeDmaConfig(2, 5, 1);
   BANKCLOSE;
   
-  EVENTCLOSE;
-  tirIntOutput(0);
+  BANKOPEN(0xfabc,BT_UI4,0);		//Sync checks
+  event_cnt = event_cnt + 1;
+  event_ty = (EVTYPE&0xf);
+  icnt = icnt + 1;
+  if(icnt > 20000) icnt = 0;
+  *dma_dabufp++ = LSWAP(0xfabc0004);
+  *dma_dabufp++ = LSWAP(event_ty);
+  *dma_dabufp++ = LSWAP(event_cnt);
+  *dma_dabufp++ = LSWAP(icnt);
+  *dma_dabufp++ = LSWAP(syncFlag);
+  *dma_dabufp++ = LSWAP(0xfaaa0001);
+  
+  //check if FIFO is empty at sync event or when no buffering
+  sync_or_unbuff = syncFlag || !buffered;
+  //  printf("sync or unbuff : %d\n",sync_or_unbuff);
+   if (sync_or_unbuff!=0)
+    {
+      scanmask = faScanMask();
+      /* Check scanmask for block ready up to 100 times */
+      datascan = faGBlockReady(scanmask, 100); 
+      stat = (datascan == scanmask);
+      
+      if (stat > 0)
+	{
+	  printf("data left in FADC FIFO at sync event\n");
+	  		//FADC sync event bank
+          nwords = faReadBlock(0, dma_dabufp, 5000, 2);	//changed rflag = 2 for Multi Block transfer 5/25/17
+	  *dma_dabufp++ = LSWAP(0xfadc250);
+	  //	  nwords = faReadBlock(faSlot(0), dma_dabufp, 25000, 2);
+	  // nwords = 0;
+	  // nwords = 0;
+	  if (nwords < 0)
+	    {
+	      printf("ERROR: in transfer (event = %d), nwords = 0x%x\n",
+		     tirGetIntCount(), nwords);
+	      //  *dma_dabufp++ = LSWAP(0xda000bad);
+	      
+	    }
+	  else
+	    {
+	      dma_dabufp += nwords;
+	    }
+	  for (islot = 0; islot < nfadc; islot++)	// 5/25/17
+	    faResetToken(faSlot(islot));
+	  for(islot = 0; islot < nfadc; islot++)
+	    {
+	      int davail = faBready(faSlot(islot));
+	      if(davail > 0)
+		{
+		  printf("%s: ERROR: fADC250 Data available after readout in SYNC event \n",
+			 __func__, davail);
+		  
+		  while(faBready(faSlot(islot)))
+		    {
+		      vmeDmaFlush(faGetA32(faSlot(islot)));
+		    }
+		}
+	    }
+	}
+  
+
+      /*
+       *dma_dabufp++ = LSWAP(0xbadbad1);
+       *dma_dabufp++ = LSWAP(0xbadbad2);
+       *dma_dabufp++ = LSWAP(0xbadbad3);
+       */
+      
+      
+      //  *dma_dabufp++ = LSWAP(0xda0000ff);	/* Event EOB */
+      
+      vmeDmaConfig(2,3,0);
+      // *dma_dabufp++ = LSWAP(tirGetIntCount());
+      
+      for(if1=0; if1<nf1tdc; if1++) {
+	F1_SLOT = f1ID[if1];
+	// Check for valid data here 
+	for(ii=0;ii<100;ii++)
+	  {
+	    datascan = f1Dready(F1_SLOT);
+	    if (datascan>0)
+	      {
+		break;
+	      }
+	  }
+	//printf("F1_datascan: %d\n",datascan);
+	if(datascan>0)
+	  {
+	    printf ("Data left in F1 FIFO\n");
+	    *dma_dabufp++ = LSWAP(0xf1ddc);
+	    nwords = f1ReadEvent(F1_SLOT,dma_dabufp,500,1);
+	    // nwords = f1PrintEvent(F1_SLOT,0);
+	    //printf("  -> nwords = %d\n",nwords);
+	    
+	    if(nwords < 0)
+	      {
+		//printf("ERROR: in transfer (event = %d), status = 0x%x\n", tirGetIntCount(),nwords);
+		// Marco:
+		printf("ERROR: in transfer (event = %d), status = 0x%x\n", tirGetIntCount(),nwords);
+		*dma_dabufp++ = LSWAP(0xda000bad);
+	      }
+	    else
+	      {
+		dma_dabufp += nwords;
+	      }
+	  }
+      }
+    }
+ BANKCLOSE;
+	EVENTCLOSE;
+	tirIntOutput(0);
 }
 
 void

@@ -283,5 +283,10 @@ begin epics
   HacL_D1_P0rb                
   HacL_Q2_P0rb                
   HacL_Q3_P0rb                
-
+ 
+ #Q1/Q2/D/Q3 current LHRS
+  MQ171LM 
+  HacL_Q2_HP3458A_IOUT
+  HacL_D1_HP3458A_IOUT
+  HacL_Q3_HP3458A_IOUT
 end epics
