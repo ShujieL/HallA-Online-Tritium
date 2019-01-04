@@ -8,8 +8,9 @@
 
 waittime=0
 counter=0
-RAWDIR=/adaq1/data1
-LOGDIR=${t2root}/log
+#RAWDIR=/adaq1/data1
+RAWDIR=/cache/halla/triton/raw/
+LOGDIR=t2root/Rootfiles/log
 gstart=0   # start from which event
 gtotal=-1 # replay how many events, -1 = full replay
 ktrue=1
@@ -18,7 +19,8 @@ thisrun=0
     
 
 pc="$(uname -n)"
-if [ $pc == "aonl3.jlab.org" ]; then  # to avoid repeating running
+#if [ $pc == "aonl3.jlab.org" ]; then  # to avoid repeating running
+if [ 1 == 1 ]; then
     echo ==========================================
     echo This script will run full replay automatically for LHRS
     echo Works only for recent runs that are stored at /adaq1/data1
